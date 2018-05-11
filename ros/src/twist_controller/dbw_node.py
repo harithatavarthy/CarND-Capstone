@@ -55,8 +55,28 @@ class DBWNode(object):
 
         # TODO: Create `Controller` object
         # self.controller = Controller(<Arguments you wish to provide>)
+	self.controller = Controller(vehicle_mass=vehicle_mass,
+				     fuel_capacity=fuel_capacity,
+				     brake_deadband=brake_deadband,
+				     decel_limit=decel_limit,
+				     accel_limit=accel_limit,
+				     wheel_radius=wheel_radius,
+				     wheel_base=wheel_base,
+				     steer_ratio=steer_ratio,
+				     max_lat_accel=max_lat_accel,
+				     max_steer_angle=max_steer_angle)
 
         # TODO: Subscribe to all the topics you need to
+	rospy.Subscriber('/vehicle/dbw_enabled', Bool, self.dbw_enabled_cb)
+	rospy.Subscriber('/twist_cmd', TwistStamped, self.twist_cb)
+	rospy.Subscriber('/current_velocity',TwistStamped, self.velocity_cb)
+
+	self.current_vel = None
+	self.curr_ang_vel = None
+	self.dbw_enabled  = None
+	self.linear_vel = None
+	self.angular_vel = None
+	self.throttle = self.steering = self.brake = 0
 
         self.loop()
 
@@ -69,16 +89,51 @@ class DBWNode(object):
             #                                                     <proposed angular velocity>,
             #                                                     <current linear velocity>,
             #                                                     <dbw status>,
-            #                                                     <any other argument you need>)
-            # if <dbw is enabled>:
+            #
+            #                                              <any other argument you need>)
+	    #rospy.logwarn("self.current_vel: %s",self.current_vel)
+	    #rospy.logwarn("self.linear_vel: %s",self.linear_vel)
+	    #if not None in (self.current_vel , self.linear_vel):
+	    	#tempa = self.current_vel - self.linear_vel
+	    #else:
+	        #tempa = None
+	    #rospy.logwarn("Diff in linear vel: %s",tempa)
+	    #rospy.logwarn("self.curr_angl_vel: %s",self.curr_ang_vel)
+	    #rospy.logwarn("self.angular_vel: %s",self.angular_vel)
+	    #if not None in (self.curr_ang_vel, self.angular_vel):
+	    	#tempb = self.curr_ang_vel - self.angular_vel
+		#if(abs(tempb) > 0.1):
+	    		#rospy.logwarn("Diff in ang vel: %s",tempb)
+			#rospy.logwarn("Steering before: %s",self.steering)
+
+	    #else:
+		#tempb = None
+
+
+            if not None in (self.current_vel, self.linear_vel, self.angular_vel,self.dbw_enabled):
+		#rospy.logwarn("i am here")
+		self.throttle, self.brake, self.steering = self.controller.control(self.current_vel,
+										   self.dbw_enabled,
+										   self.linear_vel,
+										   self.angular_vel)
+		#rospy.logwarn("Throttle computed: %s", self.throttle)
+		#rospy.logwarn("Brake Compute: %s",self.brake)
+		#if(tempb is not None):
+			#if(abs(tempb) > 0.1):
+				#rospy.logwarn("Steering Computed: %s", self.steering)
+	    # if <dbw is enabled>:
             #   self.publish(throttle, brake, steer)
-            rate.sleep()
+	    #rospy.logwarn("DBW enabled during loop ? %s",self.dbw_enabled)
+            if self.dbw_enabled:
+	    	self.publish(self.throttle, self.brake, self.steering)
+	    rate.sleep()
 
     def publish(self, throttle, brake, steer):
         tcmd = ThrottleCmd()
         tcmd.enable = True
         tcmd.pedal_cmd_type = ThrottleCmd.CMD_PERCENT
         tcmd.pedal_cmd = throttle
+
         self.throttle_pub.publish(tcmd)
 
         scmd = SteeringCmd()
@@ -91,7 +146,21 @@ class DBWNode(object):
         bcmd.pedal_cmd_type = BrakeCmd.CMD_TORQUE
         bcmd.pedal_cmd = brake
         self.brake_pub.publish(bcmd)
+	#rospy.logwarn('Throttle--Brake--Steer %s %s %s',throttle,brake,steer)
 
+    def velocity_cb(self,msg):
+	self.current_vel = msg.twist.linear.x
+	self.curr_ang_vel  = msg.twist.angular.z
+	#rospy.logwarn("Current Velocity: %s ", self.current_velocity)
+
+    def twist_cb(self,msg):
+	self.linear_vel = msg.twist.linear.x
+	self.angular_vel = msg.twist.angular.z
+	#rospy.logwarn("Current Angular Velocity: %s",self.angular_vel)
+
+    def dbw_enabled_cb(self,msg):
+	self.dbw_enabled = msg
+	#rospy.logwarn("DBW enabled flag subscribed: %s ",self.dbw_enabled)
 
 if __name__ == '__main__':
     DBWNode()
