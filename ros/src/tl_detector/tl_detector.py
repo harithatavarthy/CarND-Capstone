@@ -15,6 +15,7 @@ from scipy.spatial import KDTree
 import time
 
 STATE_COUNT_THRESHOLD = 3
+RCNN_CLASSIFIER = True
 
 class TLDetector(object):
     def __init__(self):
@@ -28,6 +29,7 @@ class TLDetector(object):
         self.lights = []
 	self.capture = False
 	self.counter = 0
+	self.prior_classification = TrafficLight.UNKNOWN
 
         sub1 = rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
         sub2 = rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
@@ -139,19 +141,24 @@ class TLDetector(object):
         #    self.prev_light_loc = None
         #    return False
 
-	if (self.has_image is True and self.capture is True):     
-		rospy.logwarn("Capturing image....")
-		if (self.counter % 10 == 0):
-			cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
-			iname = 'capture/img' + str(self.counter) + str(time.time()) + '.jpg'			
-			cv2.imwrite(iname,cv_image)
-		self.counter = self.counter + 1
+#	if (self.has_image is True and self.capture is True):     
+#		rospy.logwarn("Capturing image....")
+#		if (self.counter % 10 == 0):
+#			cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
+#			iname = 'capture/img' + str(self.counter) + str(time.time()) + '.png'			
+#			cv2.imwrite(iname,cv_image)
+#		self.counter = self.counter + 1
 		
 
         #Get classification
         #return self.light_classifier.get_classification(cv_image)
+	image_2bclassified = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
+	classification = self.light_classifier.get_classification(image_2bclassified,RCNN_CLASSIFIER)	
+	rospy.logwarn("Classification is : %s", classification)
+	self.prior_classification  = classification
+	return classification
 	
-	return light.state
+	#return light.state
 
     def process_traffic_lights(self):
         """Finds closest visible traffic light, if one exists, and determines its
