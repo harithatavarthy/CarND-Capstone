@@ -13,7 +13,7 @@ class TLClassifier(object):
     def __init__(self,RCNN_CLASSIFIER):
 	
         #TODO load classifier
-	rospy.logwarn("Initiating TL Classifier object ..")
+	rospy.logwarn("Preparing your vehicle for Autonomous Driving ..")
 	self.image = None
 	
 	self.lower_red_a = np.array([0,50,50])
@@ -21,7 +21,9 @@ class TLClassifier(object):
 	self.lower_red_b = np.array([170,50,50])
 	self.upper_red_b = np.array([180,255,255])
 	
+	
 	if(RCNN_CLASSIFIER is True):
+		rospy.logwarn("Will use Faster RCNN for traffic light detection and OpenCV to classify the color of traffic light")
 		self.working_dir = os.path.dirname(os.path.realpath(__file__))
 		self.gpath = self.working_dir + '/faster_rcnn_inception_v2_coco_2018_01_28/frozen_inference_graph_t_1_4.pb'
 
@@ -53,8 +55,9 @@ class TLClassifier(object):
         	self.detection_classes = self.detection_graph.get_tensor_by_name('detection_classes:0')
         	self.num_detections = self.detection_graph.get_tensor_by_name('num_detections:0')
 
-	
-	rospy.logwarn("Done with Initiation ..")
+	else:
+		rospy.logwarn("Using OpenCV for traffic light color classification")	
+	rospy.logwarn("Vehicle is Ready for Autonomous Driving ..")
         #pass
 	
 
@@ -125,15 +128,15 @@ class TLClassifier(object):
         #TODO implement light color prediction
 	if(RCNN_CLASSIFIER is False):
 
-		rospy.logwarn("Trying openCV method ..")
+		#rospy.logwarn("Trying openCV method ..")
 		result  = self.opencv_method(self.image)
-		rospy.logwarn("opencv result is....%s",result)
+		#rospy.logwarn("opencv result is....%s",result)
 		
 	else:
 		
-		rospy.logwarn("Trying rcnn method ..")
+		#rospy.logwarn("Trying rcnn method ..")
 		result  = self.rcnn_method()
-		rospy.logwarn("RCNN result is....%s",result)
+		#rospy.logwarn("RCNN result is....%s",result)
 		
 	return result
 	
