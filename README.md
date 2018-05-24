@@ -1,3 +1,26 @@
+Capstone project - Udacity's Self-Driving Car Engineer Nanodegree. Team members are:
+
+Ayyoub Rezaeian (arezaei8684@gmail.com) --> Team Lead
+
+Abhishek Gurudutt(abhish.ab@gmail.com)
+
+Hari Thatavarthy (hari_thatavarthy@hotmail.com)
+
+Uday Sreekanth (udayhouse@gmail.com)
+
+Mohammed Alsuayegh (malsuayegh@gmail.com)
+
+### About the Classifier :
+One of the requirement for successful completion of this project is accurate detection and classification oftraffic lights and  traffic signal inorder for the vehicle to stop at all RED lights. The team intially worked on creating an SVM(support vector machine) to detect  to use  HOG(histogram of oriented gradients) features of traffic lights. Though we were succuessful in accurately identify the traffic lights on simulator, the SVM classifier failed to accurately identify traffic lights in real world scenarios. This is mainly because in real world, traffic lights come in different sizes and shapes. We then decided to go for deep learning techniques and chose to use an existing object detection model for inferencing and classificaiton.
+
+We have not performed any kind of reinforcment or transfer learning as the chosen model was able to accurately detect the traffic lights. Here is the link to  download the model "faster_rcnn_inception_v2_coco" trained on COCO Dataset
+https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md
+
+This model has an inference speed of about 60ms and performed reasonably well on a GPU with 8 cores and 12GB Memorey.
+
+After the traffic light is detected using the above model, we then used OpenCV techniques such as "HoughCircles" to classify the traffic light signal.
+
+### Installation Instructions.
 This is the project repo for the final project of the Udacity Self-Driving Car Nanodegree: Programming a Real Self-Driving Car. For more information about the project, see the project introduction [here](https://classroom.udacity.com/nanodegrees/nd013/parts/6047fe34-d93c-4f50-8336-b70ef10cb4b2/modules/e1a23b06-329a-4684-a717-ad476f0d8dff/lessons/462c933d-9f24-42d3-8bdc-a08a5fc866e4/concepts/5ab4b122-83e6-436d-850f-9f4d26627fd9).
 
 Please use **one** of the two installation options, either native **or** docker installation.
