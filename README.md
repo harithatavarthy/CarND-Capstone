@@ -1,6 +1,6 @@
 Capstone project - Udacity's Self-Driving Car Engineer Nanodegree. Team members are:
 
-Ayyoub Rezaeian (arezaei8684@gmail.com) --> Team Lead
+Ayyoub Rezaeian (ayyoub.rezaeian@gmail.com) --> Team Lead
 
 Abhishek Gurudutt(abhish.ab@gmail.com)
 
@@ -8,7 +8,7 @@ Hari Thatavarthy (hari_thatavarthy@hotmail.com)
 
 Uday Sreekanth (udayhouse@gmail.com)
 
-Mohammed Alsuayegh (malsuayegh@gmail.com)
+Mohammed Alsuayegh (almozamjer@gmail.com)
 
 ### About the Classifier :
 One of the requirement for successful completion of this project is accurate detection and classification oftraffic lights and  traffic signal inorder for the vehicle to stop at all RED lights. The team intially worked on creating an SVM(support vector machine) to detect  to use  HOG(histogram of oriented gradients) features of traffic lights. Though we were succuessful in accurately identify the traffic lights on simulator, the SVM classifier failed to accurately identify traffic lights in real world scenarios. This is mainly because in real world, traffic lights come in different sizes and shapes. We then decided to go for deep learning techniques and chose to use an existing object detection model for inferencing and classificaiton.
